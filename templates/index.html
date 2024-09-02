@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Brewing App</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h1 class="mb-4">Coffee Brewing Settings</h1>
+    <form id="coffee-form" class="border p-4 bg-white rounded shadow-sm">
+        <div class="form-group">
+            <label for="grind_size">Grind Size:</label>
+            <input type="text" class="form-control" id="grind_size" name="grind_size" required>
+        </div>
+        <div class="form-group">
+            <label for="portion">Portion (grams):</label>
+            <input type="number" class="form-control" id="portion" name="portion" required>
+        </div>
+        <div class="form-group">
+            <label for="water_temp">Water Temperature (°C):</label>
+            <input type="number" class="form-control" id="water_temp" name="water_temp" required>
+        </div>
+        <div class="form-group">
+            <label for="brew_time">Brew Time (minutes):</label>
+            <input type="number" class="form-control" id="brew_time" name="brew_time" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Settings</button>
+    </form>
+
+    <button id="analyze-button" class="btn btn-secondary mt-3">Analyze Data</button>
+
+    <h2 class="mt-4">Analysis Results:</h2>
+    <pre id="analysis-results" class="border p-3 bg-white rounded shadow-sm"></pre>
+</div>
+
+<!-- Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    document.getElementById('coffee-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        const response = await fetch('/save', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        alert(result.message);
+    });
+
+    document.getElementById('analyze-button').addEventListener('click', async () => {
+        const response = await fetch('/analyze');
+        const analysisResults = await response.json();
+        document.getElementById('analysis-results').textContent = JSON.stringify(analysisResults, null, 2);
+    });
+</script>
+</body>
+</html>
