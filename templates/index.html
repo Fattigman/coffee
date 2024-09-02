@@ -31,8 +31,13 @@
         <button type="submit" class="btn btn-primary">Save Settings</button>
     </form>
 
-    <button id="analyze-button" class="btn btn-secondary mt-3">Analyze Data</button>
+    <button id="view-entries-button" class="btn btn-secondary mt-3">View Entries</button>
 
+    <!-- Placeholder for displaying entries -->
+    <div id="entries-container" class="mt-4"></div>
+
+    <button id="analyze-button" class="btn btn-secondary mt-3">Analyze Data</button>
+    
     <h2 class="mt-4">Analysis Results:</h2>
     <pre id="analysis-results" class="border p-3 bg-white rounded shadow-sm"></pre>
 </div>
@@ -62,6 +67,46 @@
         const response = await fetch('/analyze');
         const analysisResults = await response.json();
         document.getElementById('analysis-results').textContent = JSON.stringify(analysisResults, null, 2);
+    });
+
+    // Add event listener for the "View Entries" button
+    document.getElementById('view-entries-button').addEventListener('click', function() {
+        // Fetch entries from the database
+        fetch('/api/entries')
+            .then(response => response.json())
+            .then(data => {
+                // Display the entries in the entries-container div as a table
+                const entriesContainer = document.getElementById('entries-container');
+                entriesContainer.innerHTML = `
+                    <h3>Entries:</h3>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Grind Size</th>
+                                <th>Portion (grams)</th>
+                                <th>Water Temperature (°C)</th>
+                                <th>Brew Time (minutes)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entries-table-body">
+                        </tbody>
+                    </table>
+                `;
+                const tableBody = document.getElementById('entries-table-body');
+                data.forEach(entry => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${entry.grind_size}</td>
+                        <td>${entry.portion}</td>
+                        <td>${entry.water_temp}</td>
+                        <td>${entry.brew_time}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching entries:', error);
+            });
     });
 </script>
 </body>
